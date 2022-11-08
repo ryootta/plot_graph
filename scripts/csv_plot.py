@@ -27,6 +27,7 @@ def import_data(date, time):
     return raw_array, filter_array, true_array 
 
 def print_graph(array, date, time):
+    # figureフォルダの作成
     dir_path =  os.path.join(os.path.dirname(__file__), "..", "data", date, "figure")
     try:
         os.mkdir(dir_path)
@@ -36,18 +37,24 @@ def print_graph(array, date, time):
             pass
         else:
             raise
+
+    # raw_data.jpgの作成
     fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(12, 5))
     fig.suptitle('Raw Data', fontsize=16)
-    index = [i for i in range(len(array[0]))]
-    axs[0].scatter(index, array[0][:, 1], s=1, label="x")
+    raw_time = [i/40 for i in range(len(array[0]))]
+    true_time = [i/1000 for i in range(len(array[2]))]
+    axs[0].scatter(raw_time,  array[0][:, 1], s=1, label="x")
+    axs[0].scatter(true_time, array[2][:, 0], s=1, label="tx")
+    axs[1].scatter(raw_time,  array[0][:, 2], s=1, label="y")
+    axs[1].scatter(true_time, array[2][:, 1], s=1, label="ty")
     axs[0].set_ylabel("x")
-    axs[0].set_xlabel("Time")
-    axs[1].scatter(index, array[0][:, 2], s=1, label="y")
+    axs[0].set_xlabel("Time [s]")
     axs[1].set_ylabel("y")
-    axs[1].set_xlabel("Time")
+    axs[1].set_xlabel("Time [s]")
     #axs[0].set_ylim(ylimit[0], ylimit[1])
     plt.savefig(os.path.join("figure", "raw_data" + time + ".jpg"))
 
+    # tracked_ata.jpgの作成
     fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(12, 6))
     fig.suptitle('Tracked Data', fontsize=16)
     axs[0][0].scatter(array[1][:, 0], array[1][:, 1], s=1, label="x")

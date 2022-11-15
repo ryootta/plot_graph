@@ -1,6 +1,0 @@
-<launch>
-  <node pkg="plot_graph" type="obstacle_observed_writer.py" name="obstacle_observed_writer" />
-  <node pkg="plot_graph" type="tracked_obstacle_writer.py" name="tracked_obstacle_writer" />
-  <node pkg="plot_graph" type="obstacle_true_writer.py" name="obstacle_true_writer" output="screen" />
-</launch>
-

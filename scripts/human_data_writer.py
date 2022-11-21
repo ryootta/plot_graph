@@ -12,7 +12,7 @@ class Writer(cw.CsvWriter):
         rospy.Subscriber("/tracked_obstacles", Obstacles, self.tracked_obstacles_callback)
         rospy.Subscriber("/gazebo/model_states", ModelStates, self.human_callback)
         csv_name = "raw_obstacles"
-        header = ["times", "x", "y", "vx", "vy", "radius"]
+        header = ["times", "x1", "y1", "vx1", "vy1", "radiusl", "x2", "y2", "vx2", "vy2", "radius2", "x3", "y3", "vx3", "vy3", "radius3"]
         self.RawObstaclesWriter = cw.CsvWriter(csv_name, header)
         csv_name = "tracked_obstacles"
         self.TrackedObstaclesWriter = cw.CsvWriter(csv_name, header)

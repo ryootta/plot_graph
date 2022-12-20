@@ -10,12 +10,15 @@ class Writer(cw.CsvWriter):
     def __init__(self):
         rospy.Subscriber("/raw_obstacles", Obstacles, self.raw_obstacles_callback)
         rospy.Subscriber("/tracked_obstacles", Obstacles, self.tracked_obstacles_callback)
+        rospy.Subscriber("/kalman_filtered_obstacles", Obstacles, self.kalman_filtered_obstacles_callback)
         rospy.Subscriber("/gazebo/model_states", ModelStates, self.human_callback)
         csv_name = "raw_obstacles"
         header = ["times", "x1", "y1", "vx1", "vy1", "radiusl", "x2", "y2", "vx2", "vy2", "radius2", "x3", "y3", "vx3", "vy3", "radius3"]
         self.RawObstaclesWriter = cw.CsvWriter(csv_name, header)
         csv_name = "tracked_obstacles"
         self.TrackedObstaclesWriter = cw.CsvWriter(csv_name, header)
+        csv_name = "kalman_filtered_obstacles"
+        self.KalmanFilteredObstaclesWriter = cw.CsvWriter(csv_name, header)
         csv_name = "true_obstacle"
         header = ["x", "y", "vx", "vy"]
         self.TrueObstacleWriter = cw.CsvWriter(csv_name, header)
@@ -48,6 +51,20 @@ class Writer(cw.CsvWriter):
                             msg.circles[i].true_radius]) 
         self.TrackedObstaclesWriter.over_writer(data)
 
+    def kalman_filtered_obstacles_callback(self, msg):
+        # nano is 10^-9
+        t = msg.header.stamp.secs + msg.header.stamp.nsecs*(10**(-9))
+        data = [t]
+        # -1 mean None.
+        if len(msg.circles) == 0:
+            data.extend([-1, -1, -1, -1, -1])
+        else:
+            for i in range(len(msg.circles)):
+               data.extend([msg.circles[i].center.x, msg.circles[i].center.y,\
+                            msg.circles[i].velocity.x, msg.circles[i].velocity.y,\
+                            msg.circles[i].true_radius]) 
+        self.KalmanFilteredObstaclesWriter.over_writer(data)
+
     def human_callback(self, msg):
         for i in range(len(msg.name)):
             if msg.name[i] == "human":
@@ -58,5 +75,6 @@ class Writer(cw.CsvWriter):
 
 if __name__ == '__main__':
     rospy.init_node('human_data_writer')
+    print("Start writing")
     w = Writer()
     rospy.spin()
